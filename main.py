@@ -9,6 +9,7 @@ from telegram.ext import Updater, CommandHandler
 # Các thông tin cần thiết để thực hiện truy vấn tới API của Cloudflare
 zone_id = os.environ.get('CF_ZONE_ID')
 record_id = os.environ.get('CF_RECORD_ID')
+domain = os.environ.get('CF_RECORD_DOMAIN')
 api_token = os.environ.get('CF_API_TOKEN')
 
 # Các thông tin cần thiết để gửi thông báo tới Telegram
@@ -16,8 +17,9 @@ bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
 chat_id = os.environ.get('TELEGRAM_CHAT_ID')
 
 redis_host = os.environ.get('REDIS_HOST')
+redis_port = os.environ.get('REDIS_PORT', 6379)
 
-redis = redis.Redis(host=redis_host, port=6379, db=0, charset="utf-8", decode_responses=True)
+redis = redis.Redis(host=redis_host, port=redis_port, db=0, charset="utf-8", decode_responses=True)
 
 def get_current_ip():
     # Thực hiện truy vấn tới API để lấy địa chỉ IP mới nhất
@@ -42,7 +44,7 @@ def update_cloudflare_record(ip_address):
     }
     data = {
         "type": "A",
-        "name": "mu",  # Tên miền của bạn
+        "name": domain,  # Tên miền của bạn
         "content": ip_address,
         "ttl": 120,
         "proxied": True
